@@ -57,29 +57,29 @@ export const SEED_ACHIEVEMENTS: Achievement[] = [
 ];
 
 export function getUser(): User | null {
-  const raw = localStorage.getItem('proofline_user');
+  const raw = localStorage.getItem('achievement_record_user');
   if (!raw) return null;
   try { return JSON.parse(raw); } catch { return null; }
 }
 
 export function getAchievements(): Achievement[] {
-  const raw = localStorage.getItem('proofline_achievements');
+  const raw = localStorage.getItem('achievement_record_achievements');
   if (!raw) return [];
   try { return JSON.parse(raw); } catch { return []; }
 }
 
 export function saveAchievements(items: Achievement[]): void {
-  localStorage.setItem('proofline_achievements', JSON.stringify(items));
+  localStorage.setItem('achievement_record_achievements', JSON.stringify(items));
 }
 
 export function getBooks(): Book[] {
-  const raw = localStorage.getItem('proofline_books');
+  const raw = localStorage.getItem('achievement_record_books');
   if (!raw) return [];
   try { return JSON.parse(raw); } catch { return []; }
 }
 
 export function saveBooks(items: Book[]): void {
-  localStorage.setItem('proofline_books', JSON.stringify(items));
+  localStorage.setItem('achievement_record_books', JSON.stringify(items));
 }
 
 export function categoryIcon(cat: string): string {

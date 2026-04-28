@@ -17,7 +17,7 @@ export default function Sidebar() {
     <aside className="flex flex-col h-full" style={{ width: 220, background: '#141929', borderRight: '1px solid #1E2740', minHeight: '100vh' }}>
       {/* Logo */}
       <div className="px-5 py-5" style={{ borderBottom: '1px solid #1E2740' }}>
-        <span className="text-lg font-bold text-white">Proofline</span>
+        <span className="text-lg font-bold text-white">Achievement Record</span>
       </div>
 
       {/* Nav */}

@@ -10,9 +10,9 @@ export default function Signup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const user = { name, email };
-    localStorage.setItem('proofline_user', JSON.stringify(user));
+    localStorage.setItem('achievement_record_user', JSON.stringify(user));
     // Seed sample achievements if none exist
-    const existing = localStorage.getItem('proofline_achievements');
+    const existing = localStorage.getItem('achievement_record_achievements');
     if (!existing) {
       saveAchievements(SEED_ACHIEVEMENTS);
     }

@@ -84,7 +84,7 @@ function generatePayRise(achievements: Achievement[], books: Book[]): string {
 }
 
 function generateLinkedIn(achievements: Achievement[], books: Book[]): string {
-  const user = JSON.parse(localStorage.getItem('proofline_user') || '{}');
+  const user = JSON.parse(localStorage.getItem('achievement_record_user') || '{}');
   const name = user.name || 'Professional';
   const topWins = achievements.filter(a => a.category === 'work').slice(0, 3);
   const skills = [...new Set(achievements.flatMap(a => a.tags))].slice(0, 5);
@@ -134,7 +134,7 @@ function OutputPanel({ content, locked }: { content: string; locked?: boolean })
         >
           <div className="text-3xl mb-3">🔒</div>
           <p className="font-semibold text-white mb-1">Pro feature</p>
-          <p className="text-sm mb-4" style={{ color: '#9CA3AF' }}>Unlock with Proofline Pro</p>
+          <p className="text-sm mb-4" style={{ color: '#9CA3AF' }}>Unlock with Achievement Record Pro</p>
           <button
             className="px-5 py-2 rounded-lg font-semibold text-white text-sm cursor-pointer"
             style={{ background: '#FF6B2B' }}

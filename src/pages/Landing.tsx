@@ -16,8 +16,8 @@ export default function Landing() {
       {/* Nav */}
       <nav style={{ borderBottom: '1px solid #1E2740' }} className="px-6 py-4 flex items-center justify-between">
         <div>
-          <span className="text-xl font-bold text-white">Proofline</span>
-          <span className="ml-3 text-sm" style={{ color: '#6B7280' }}>Your career, always on record.</span>
+          <span className="text-xl font-bold text-white">Achievement Record</span>
+          <span className="ml-3 text-sm" style={{ color: '#6B7280' }}>Your career achievements, always on record.</span>
         </div>
         <button
           onClick={() => navigate('/signup')}
@@ -36,7 +36,7 @@ export default function Landing() {
             <span style={{ color: '#FF6B2B' }}>organised for you.</span>
           </h1>
           <p className="text-lg mb-8" style={{ color: '#9CA3AF' }}>
-            Drop in your CV, LinkedIn profile, certificates and work wins. Proofline turns them into an always-updated career profile, review summary, and pay-rise evidence pack.
+            Drop in your CV, LinkedIn profile, certificates and work wins. Achievement Record turns them into an always-updated career profile, review summary, and pay-rise evidence pack.
           </p>
           <div className="flex flex-wrap gap-4">
             <button
@@ -107,7 +107,7 @@ export default function Landing() {
           <div>
             <h3 className="text-xl font-bold mb-2">Track the books you've read</h3>
             <p style={{ color: '#9CA3AF' }}>
-              Because the best professionals never stop learning. Log your reads, capture key takeaways, and Proofline includes them in your professional development evidence automatically.
+              Because the best professionals never stop learning. Log your reads, capture key takeaways, and Achievement Record includes them in your professional development evidence automatically.
             </p>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="px-6 py-8 text-center text-sm" style={{ borderTop: '1px solid #1E2740', color: '#6B7280' }}>
         <div className="flex flex-wrap justify-center gap-6">
-          <span className="font-semibold text-white">Proofline</span>
+          <span className="font-semibold text-white">Achievement Record</span>
           <a href="#" className="hover:text-white transition-colors">Privacy</a>
           <a href="#" className="hover:text-white transition-colors">Terms</a>
           <span>A Second Orbit product</span>

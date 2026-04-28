@@ -8,7 +8,7 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const raw = localStorage.getItem('proofline_user');
+    const raw = localStorage.getItem('achievement_record_user');
     if (raw) {
       try {
         const user = JSON.parse(raw);
@@ -26,7 +26,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
-          <p className="text-sm" style={{ color: '#9CA3AF' }}>Sign in to your Proofline account</p>
+          <p className="text-sm" style={{ color: '#9CA3AF' }}>Sign in to your Achievement Record account</p>
         </div>
 
         <div className="rounded-xl p-8" style={{ background: '#141929', border: '1px solid #1E2740' }}>
