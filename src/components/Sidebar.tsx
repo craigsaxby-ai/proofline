@@ -7,6 +7,7 @@ const navItems = [
   { icon: '📁', label: 'Documents', path: '/documents' },
   { icon: '📚', label: 'Books', path: '/books' },
   { icon: '✦', label: 'Outputs', path: '/outputs' },
+  { icon: '📅', label: 'Timeline', path: '/timeline' },
 ];
 
 export default function Sidebar() {

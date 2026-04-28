@@ -183,11 +183,11 @@ export default function Outputs() {
     setBooks(getBooks());
   }, [navigate]);
 
-  const tabs: { key: Tab; label: string; locked?: boolean }[] = [
+  const tabs: { key: Tab; label: string }[] = [
     { key: 'cv', label: '📄 CV Bullets' },
     { key: 'review', label: '📋 Annual Review' },
-    { key: 'payrise', label: '💰 Pay Rise Pack', locked: true },
-    { key: 'linkedin', label: '💼 LinkedIn About', locked: true },
+    { key: 'payrise', label: '💰 Pay Rise Pack' },
+    { key: 'linkedin', label: '💼 LinkedIn About' },
   ];
 
   const content = {
@@ -220,7 +220,6 @@ export default function Outputs() {
               }}
             >
               {t.label}
-              {t.locked && <span className="text-xs" style={{ opacity: 0.7 }}>🔒</span>}
             </button>
           ))}
         </div>
@@ -228,7 +227,6 @@ export default function Outputs() {
         {/* Output */}
         <OutputPanel
           content={content[tab]}
-          locked={tabs.find(t => t.key === tab)?.locked}
         />
 
         {achievements.length === 0 && (

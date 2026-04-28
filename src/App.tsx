@@ -7,6 +7,7 @@ import Achievements from './pages/Achievements';
 import Books from './pages/Books';
 import Outputs from './pages/Outputs';
 import Documents from './pages/Documents';
+import Timeline from './pages/Timeline';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/books" element={<Books />} />
         <Route path="/outputs" element={<Outputs />} />
         <Route path="/documents" element={<Documents />} />
+        <Route path="/timeline" element={<Timeline />} />
       </Routes>
     </BrowserRouter>
   );

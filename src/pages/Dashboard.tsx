@@ -4,12 +4,18 @@ import Sidebar from '../components/Sidebar';
 import { getUser, getAchievements, saveAchievements, categoryIcon } from '../types';
 import type { Achievement } from '../types';
 
+const SpeechRecognitionAPI =
+  typeof window !== 'undefined'
+    ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    : null;
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [quickAdd, setQuickAdd] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Achievement['category']>('work');
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [added, setAdded] = useState(false);
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     const user = getUser();
@@ -88,11 +94,43 @@ export default function Dashboard() {
               type="text"
               value={quickAdd}
               onChange={e => setQuickAdd(e.target.value)}
-              placeholder="What did you achieve today?"
+              placeholder={isListening ? '🎤 Listening…' : 'What did you achieve today?'}
               className="flex-1 px-4 py-3 rounded-lg text-white outline-none text-sm"
-              style={{ background: '#0A0F1E', border: '1px solid #1E2740' }}
+              style={{ background: '#0A0F1E', border: `1px solid ${isListening ? '#FF6B2B' : '#1E2740'}` }}
               onKeyDown={e => e.key === 'Enter' && handleQuickAdd()}
             />
+            {SpeechRecognitionAPI && (
+              <button
+                onClick={() => {
+                  if (isListening) return;
+                  const recognition = new SpeechRecognitionAPI();
+                  recognition.continuous = false;
+                  recognition.interimResults = true;
+                  recognition.onresult = (event: any) => {
+                    const transcript = Array.from(event.results as any[])
+                      .map((r: any) => r[0].transcript)
+                      .join('');
+                    setQuickAdd(transcript);
+                  };
+                  recognition.onend = () => setIsListening(false);
+                  recognition.onerror = () => setIsListening(false);
+                  setIsListening(true);
+                  recognition.start();
+                }}
+                title="Speak your achievement"
+                className="px-4 py-3 rounded-lg font-semibold text-white cursor-pointer text-sm transition-all"
+                style={{
+                  background: isListening ? '#c94d0e' : '#1E2740',
+                  animation: isListening ? 'pulse 1s infinite' : 'none',
+                  minWidth: 48,
+                }}
+              >
+                🎤
+              </button>
+            )}
+            {isListening && (
+              <p className="absolute mt-14 text-xs" style={{ color: '#FF6B2B' }}>🎤 Speak your achievement</p>
+            )}
             <button
               onClick={handleQuickAdd}
               className="px-5 py-3 rounded-lg font-semibold text-white cursor-pointer text-sm"
