@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getUser, getBooks, saveBooks } from '../types';
 import type { Book } from '../types';
+import { supabase } from '../lib/supabase';
 
 const emptyBook = (): Omit<Book, 'id'> => ({
   title: '',
@@ -49,6 +50,21 @@ export default function Books() {
     setBooks(updated);
     setShowModal(false);
     setForm(emptyBook());
+
+    // Persist to Supabase for cross-device sync
+    const user = JSON.parse(localStorage.getItem('achievement_record_user') || '{}')
+    if (user.email && supabase) {
+      supabase.from('ar_books').insert({
+        user_email: user.email,
+        title: form.title,
+        author: form.author,
+        date_read: form.dateRead,
+        key_takeaway: form.takeaway,
+        rating: form.rating,
+      }).then(({ error }: { error: unknown }) => {
+        if (error) console.error('[ar] book save error:', error)
+      })
+    }
   };
 
   const handleDelete = (id: string) => {

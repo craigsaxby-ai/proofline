@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getUser, getAchievements, saveAchievements, categoryIcon } from '../types';
 import type { Achievement } from '../types';
+import { supabase } from '../lib/supabase';
 
 const CATEGORIES = ['All', 'work', 'certificate', 'course', 'book', 'project'] as const;
 type FilterCat = typeof CATEGORIES[number];
@@ -45,12 +46,32 @@ export default function Achievements() {
   const handleSave = () => {
     if (!form.title.trim()) return;
     const tags = tagInput.split(',').map(t => t.trim()).filter(Boolean);
+    const isNew = !editId;
     const updated = editId
       ? achievements.map(a => a.id === editId ? { ...form, tags, id: editId } : a)
       : [{ ...form, tags, id: Date.now().toString() }, ...achievements];
     saveAchievements(updated);
     setAchievements(updated);
     setShowModal(false);
+
+    // Persist new achievements to Supabase for cross-device sync
+    if (isNew) {
+      const user = JSON.parse(localStorage.getItem('achievement_record_user') || '{}')
+      if (user.email && supabase) {
+        supabase.from('ar_achievements').insert({
+          user_email: user.email,
+          category: form.category,
+          title: form.title,
+          date: form.date,
+          description: form.description,
+          impact: form.impact,
+          tags: tags,
+          employer: form.employer,
+        }).then(({ error }: { error: unknown }) => {
+          if (error) console.error('[ar] achievement save error:', error)
+        })
+      }
+    }
   };
 
   const handleDelete = (id: string) => {
