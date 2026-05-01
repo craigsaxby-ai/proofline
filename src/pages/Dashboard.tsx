@@ -31,7 +31,25 @@ export default function Dashboard() {
     projects: achievements.filter(a => a.category === 'project').length,
   };
 
-  const profileStrength = Math.min(100, 10 + achievements.length * 12);
+  const profileStrength = Math.min(100, Math.round((achievements.length / 20) * 100));
+
+  const streakMessage = (() => {
+    if (achievements.length === 0) return null;
+    const now = new Date();
+    const recentCount = achievements.filter(a => {
+      if (!a.date) return false;
+      const diff = (now.getTime() - new Date(a.date + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24);
+      return diff <= 7;
+    }).length;
+    if (recentCount > 0) {
+      return `🔥 Added ${recentCount} achievement${recentCount !== 1 ? 's' : ''} this week`;
+    }
+    const sorted = [...achievements].filter(a => a.date).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (sorted.length === 0) return null;
+    const daysSince = Math.floor((now.getTime() - new Date(sorted[0].date + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24));
+    if (daysSince >= 7) return `💤 No new achievements in ${daysSince} days. Log a win!`;
+    return null;
+  })();
 
   const handleQuickAdd = () => {
     if (!quickAdd.trim()) return;
@@ -75,6 +93,11 @@ export default function Dashboard() {
                   ? 'Add more achievements to improve your score'
                   : 'Great progress! Keep adding wins.'}
               </p>
+              {streakMessage && (
+                <p className="text-xs mt-1 font-medium" style={{ color: profileStrength > 0 && streakMessage.startsWith('🔥') ? '#FF6B2B' : '#6B7280' }}>
+                  {streakMessage}
+                </p>
+              )}
             </div>
             <span className="text-2xl font-bold" style={{ color: '#FF6B2B' }}>{profileStrength}%</span>
           </div>

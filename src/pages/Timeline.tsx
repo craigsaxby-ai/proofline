@@ -29,10 +29,22 @@ export default function Timeline() {
   useEffect(() => {
     const user = getUser();
     if (!user) { navigate('/signup'); return; }
-    setAchievements(getAchievements());
+    const loaded = getAchievements();
+    setAchievements(loaded);
+    if (loaded.length > 0) {
+      const g = groupByYear(loaded);
+      if (g.length > 0) setExpandedYears(new Set([g[0].year]));
+    }
   }, [navigate]);
 
   const groups = groupByYear(achievements);
+
+  const formatMonthYear = (date: string) => {
+    if (!date) return date;
+    try {
+      return new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    } catch { return date; }
+  };
 
   const toggleYear = (year: string) => {
     setExpandedYears(prev => {
@@ -62,10 +74,10 @@ export default function Timeline() {
           </div>
         ) : (
           <div className="relative ml-4">
-            {/* Vertical line */}
+            {/* Vertical line — starts at centre of first year circle */}
             <div
-              className="absolute left-6 top-0 bottom-0 w-0.5"
-              style={{ background: '#1E2740' }}
+              className="absolute top-6 bottom-0 w-0.5"
+              style={{ background: '#1E2740', left: '1.5rem' }}
             />
 
             <div className="space-y-10">
@@ -75,10 +87,10 @@ export default function Timeline() {
 
                 return (
                   <div key={year} className="relative pl-16">
-                    {/* Year circle */}
+                    {/* Year circle — centred on the vertical line (line at left 1.5rem, circle 3rem wide) */}
                     <div
-                      className="absolute left-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-lg"
-                      style={{ background: '#FF6B2B', top: 0, zIndex: 1 }}
+                      className="absolute w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-lg"
+                      style={{ background: '#FF6B2B', top: 0, left: 0, zIndex: 1 }}
                     >
                       {yearAchievements.length}
                     </div>
@@ -159,7 +171,7 @@ export default function Timeline() {
                                 </div>
                               )}
                             </div>
-                            <span className="text-xs shrink-0" style={{ color: '#4B5563' }}>{item.date}</span>
+                            <span className="text-xs shrink-0" style={{ color: '#4B5563' }}>{formatMonthYear(item.date)}</span>
                           </div>
                         ))}
                       </div>
