@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getUser, getAchievements, saveAchievements, categoryIcon } from '../types';
 import type { Achievement } from '../types';
+import { supabase } from '../lib/supabase';
 
 const SpeechRecognitionAPI =
   typeof window !== 'undefined'
@@ -21,6 +22,36 @@ export default function Dashboard() {
     const user = getUser();
     if (!user) { navigate('/signup'); return; }
     setAchievements(getAchievements());
+    // Read back from Supabase for cross-device sync
+    if (supabase && user.email) {
+      supabase
+        .from('ar_achievements')
+        .select('*')
+        .eq('user_email', user.email)
+        .then(({ data }: { data: any[] | null }) => {
+          if (!data || data.length === 0) return
+          const local = getAchievements()
+          const localIds = new Set(local.map(a => a.id))
+          const fromCloud: Achievement[] = data.map((row: any) => ({
+            id: row.id,
+            category: row.category,
+            title: row.title,
+            date: row.date,
+            description: row.description || '',
+            impact: row.impact || '',
+            tags: row.tags || [],
+            employer: row.employer || '',
+          }))
+          const newItems = fromCloud.filter(a => !localIds.has(a.id))
+          if (newItems.length > 0) {
+            const merged = [...local, ...newItems].sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )
+            saveAchievements(merged)
+            setAchievements(merged)
+          }
+        })
+    }
   }, [navigate]);
 
   const stats = {
