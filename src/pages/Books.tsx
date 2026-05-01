@@ -41,6 +41,34 @@ export default function Books() {
     const user = getUser();
     if (!user) { navigate('/signup'); return; }
     setBooks(getBooks());
+    // Read back from Supabase for cross-device sync
+    if (supabase && user.email) {
+      supabase
+        .from('ar_books')
+        .select('*')
+        .eq('user_email', user.email)
+        .then(({ data }: { data: any[] | null }) => {
+          if (!data || data.length === 0) return
+          const local = getBooks()
+          const localIds = new Set(local.map(b => b.id))
+          const fromCloud = data.map((row: any) => ({
+            id: row.id,
+            title: row.title,
+            author: row.author,
+            dateRead: row.date_read,
+            takeaway: row.key_takeaway || '',
+            rating: row.rating || 3,
+          }))
+          const newItems = fromCloud.filter(b => !localIds.has(b.id))
+          if (newItems.length > 0) {
+            const merged = [...local, ...newItems].sort(
+              (a, b) => new Date(b.dateRead).getTime() - new Date(a.dateRead).getTime()
+            )
+            saveBooks(merged)
+            setBooks(merged)
+          }
+        })
+    }
   }, [navigate]);
 
   const handleSave = () => {
