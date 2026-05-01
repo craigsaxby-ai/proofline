@@ -31,6 +31,36 @@ export default function Achievements() {
     const user = getUser();
     if (!user) { navigate('/signup'); return; }
     setAchievements(getAchievements());
+    // Read back from Supabase for cross-device sync
+    if (supabase && user.email) {
+      supabase
+        .from('ar_achievements')
+        .select('*')
+        .eq('user_email', user.email)
+        .then(({ data }: { data: any[] | null }) => {
+          if (!data || data.length === 0) return
+          const local = getAchievements()
+          const localIds = new Set(local.map(a => a.id))
+          const fromCloud: Achievement[] = data.map((row: any) => ({
+            id: row.id,
+            category: row.category,
+            title: row.title,
+            date: row.date,
+            description: row.description || '',
+            impact: row.impact || '',
+            tags: row.tags || [],
+            employer: row.employer || '',
+          }))
+          const newItems = fromCloud.filter(a => !localIds.has(a.id))
+          if (newItems.length > 0) {
+            const merged = [...local, ...newItems].sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )
+            saveAchievements(merged)
+            setAchievements(merged)
+          }
+        })
+    }
   }, [navigate]);
 
   const filtered = filter === 'All' ? achievements : achievements.filter(a => a.category === filter);
@@ -46,7 +76,6 @@ export default function Achievements() {
   const handleSave = () => {
     if (!form.title.trim()) return;
     const tags = tagInput.split(',').map(t => t.trim()).filter(Boolean);
-    const isNew = !editId;
     const updated = editId
       ? achievements.map(a => a.id === editId ? { ...form, tags, id: editId } : a)
       : [{ ...form, tags, id: Date.now().toString() }, ...achievements];
@@ -54,23 +83,23 @@ export default function Achievements() {
     setAchievements(updated);
     setShowModal(false);
 
-    // Persist new achievements to Supabase for cross-device sync
-    if (isNew) {
-      const user = JSON.parse(localStorage.getItem('achievement_record_user') || '{}')
-      if (user.email && supabase) {
-        supabase.from('ar_achievements').insert({
-          user_email: user.email,
-          category: form.category,
-          title: form.title,
-          date: form.date,
-          description: form.description,
-          impact: form.impact,
-          tags: tags,
-          employer: form.employer,
-        }).then(({ error }: { error: unknown }) => {
-          if (error) console.error('[ar] achievement save error:', error)
-        })
-      }
+    // Persist to Supabase for cross-device sync
+    const user = JSON.parse(localStorage.getItem('achievement_record_user') || '{}')
+    if (user.email && supabase) {
+      const id = editId ?? Date.now().toString()
+      supabase.from('ar_achievements').upsert({
+        id,
+        user_email: user.email,
+        category: form.category,
+        title: form.title,
+        date: form.date,
+        description: form.description,
+        impact: form.impact,
+        tags: tags,
+        employer: form.employer,
+      }).then(({ error }: { error: unknown }) => {
+        if (error) console.error('[ar] achievement save error:', error)
+      })
     }
   };
 
@@ -78,6 +107,12 @@ export default function Achievements() {
     const updated = achievements.filter(a => a.id !== id);
     saveAchievements(updated);
     setAchievements(updated);
+    // Delete from Supabase too
+    if (supabase) {
+      supabase.from('ar_achievements').delete().eq('id', id).then(({ error }: { error: unknown }) => {
+        if (error) console.error('[ar] achievement delete error:', error)
+      })
+    }
   };
 
   return (
